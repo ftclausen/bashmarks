@@ -48,7 +48,9 @@ function s {
     if [ -z "$exit_message" ]; then
         _purge_line "$SDIRS" "export DIR_$1="
         CURDIR=$(echo $PWD| sed "s#^$HOME#\$HOME#g")
-        echo "export DIR_$1=\"$CURDIR\"" >> $SDIRS
+        new_version=$(mktemp -u bashmarks-XXXXXX)
+        echo "export DIR_$1=\"$CURDIR\"" > "$new_version"
+        mv "$new_version" "$SDIRS"
     fi
 }
 
@@ -143,7 +145,7 @@ function _compzsh {
 function _purge_line {
     if [ -s "$1" ]; then
         # safely create a temp file
-        t=$(mktemp -t bashmarks.XXXXXX) || exit 1
+        t=$(mktemp -u -t bashmarks.XXXXXX) || exit 1
         trap "/bin/rm -f -- '$t'" EXIT
 
         # purge line
